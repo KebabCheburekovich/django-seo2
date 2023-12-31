@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import collections
+from typing import Callable
 
 from django import template
 from django.template import VariableDoesNotExist
@@ -30,7 +30,7 @@ class MetadataNode(template.Node):
                    "{% get_metadata for object %}")
             raise template.TemplateSyntaxError(msg)
         else:
-            if isinstance(target, collections.Callable):
+            if isinstance(target, Callable):
                 target = target()
             if isinstance(target, string_types):
                 path = target

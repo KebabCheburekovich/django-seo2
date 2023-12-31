@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
+from typing import Callable
 import collections
-
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.db.utils import IntegrityError
 from django.conf import settings
 from django.db import models
@@ -10,7 +10,7 @@ from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.template import Template, Context
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 from six import string_types, with_metaclass
 
 from djangoseo.utils import resolve_to_name, NotSet, Literal
@@ -48,7 +48,7 @@ class MetadataBaseModel(models.Model):
 
             # Otherwise, return an appropriate default value (populate_from)
             populate_from = element.populate_from
-            if isinstance(populate_from, collections.Callable):
+            if isinstance(populate_from, Callable):
                 return populate_from(self, **self._populate_from_kwargs())
             elif isinstance(populate_from, Literal):
                 return populate_from.value
@@ -61,7 +61,7 @@ class MetadataBaseModel(models.Model):
         except AttributeError:
             pass
         else:
-            if isinstance(value, collections.Callable):
+            if isinstance(value, Callable):
                 if getattr(value, '__self__', None):
                     return value(self)
                 else:
@@ -328,6 +328,7 @@ class ModelInstanceBackend(MetadataBackend):
             _content_type = models.ForeignKey(
                 ContentType,
                 verbose_name=_("model"),
+                on_delete=models.CASCADE,
             )
 
             _object_id = models.PositiveIntegerField(
@@ -425,6 +426,7 @@ class ModelBackend(MetadataBackend):
             _content_type = models.ForeignKey(
                 ContentType,
                 verbose_name=_("model"),
+                on_delete=models.CASCADE,
             )
 
             if options.use_sites:
@@ -448,7 +450,7 @@ class ModelBackend(MetadataBackend):
             objects = self.get_manager(options)()
 
             def __str__(self):
-                return str(self._content_type)
+                return self._content_type
 
             def _process_context(self, context):
                 """ Use the given model instance as context for rendering

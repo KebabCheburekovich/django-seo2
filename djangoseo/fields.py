@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-import collections
+from typing import Callable
 import re
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from six import string_types
 
 from djangoseo.utils import escape_tags, NotSet, Literal
@@ -56,7 +56,7 @@ class MetadataField(object):
             self.name = name
         # Populate the hep text from populate_from if it's missing
         if not self.help_text and self.populate_from is not NotSet:
-            if isinstance(self.populate_from, collections.Callable) and \
+            if isinstance(self.populate_from, Callable) and \
                     hasattr(self.populate_from, 'short_description'):
                 self.help_text = _('If empty, %s') \
                     % self.populate_from.short_description
@@ -71,7 +71,7 @@ class MetadataField(object):
             elif isinstance(self.populate_from, string_types) and hasattr(
                     cls, self.populate_from):
                 populate_from = getattr(cls, self.populate_from, None)
-                if isinstance(populate_from, collections.Callable) \
+                if isinstance(populate_from, Callable) \
                         and hasattr(populate_from, 'short_description'):
                     self.help_text = _(
                         'If empty, %s') % populate_from.short_description

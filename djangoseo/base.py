@@ -6,14 +6,15 @@ from __future__ import unicode_literals
 # * Make backends optional: Meta.backends = (path, modelinstance/model, view)
 
 import hashlib
+from typing import Callable
 import collections
-
 from django.db import models
-from django.utils.functional import curry
+from functools import partial as curry
 from django.contrib.contenttypes.models import ContentType
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
-from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
+from django.utils.encoding import iri_to_uri
+from six import python_2_unicode_compatible
 from six import with_metaclass, text_type
 
 
@@ -78,7 +79,7 @@ class FormattedMetadata(object):
         # TODO: This is duplicated in meta_models. Move this to a common home.
         if name in self.__metadata._meta.elements:
             populate_from = self.__metadata._meta.elements[name].populate_from
-            if isinstance(populate_from, collections.Callable):
+            if isinstance(populate_from, Callable):
                 return populate_from(None)
             elif isinstance(populate_from, Literal):
                 return populate_from.value
